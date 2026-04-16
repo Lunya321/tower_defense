@@ -1,4 +1,4 @@
-from algorithms.astar import a_star_researh
+from algorithms.astar import a_star_search
 
 class MapModel:
     def __init__(self, width=20, height=15):
@@ -26,7 +26,7 @@ class MapModel:
         self.spawn_point = (0, 1)
         self.base_point = (19, 7)
 
-        self.path = a_star_researh(self, self.spawn_point, self.base_point)
+        self.path = a_star_search(self, self.spawn_point, self.base_point)
 
     def get_tile(self, x, y):
         if 0 <= x < self.width and 0 <= y < self.height:
