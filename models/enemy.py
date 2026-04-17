@@ -14,6 +14,13 @@ class Enemy:
         self.speed = 100
         self.is_alive = True
 
+        self.hp = 100
+
+    def take_damage(self, amount):
+        self.hp -= amount
+        if self.hp <= 0:
+            self.is_alive = False
+
     def update(self, dt):
         if not self.is_alive:
             return
