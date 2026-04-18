@@ -6,7 +6,7 @@ class Tower:
         self.grid_y = grid_y
         self.tile_size = tile_size
 
-        self.pos = pygame.Vecot2(
+        self.pos = pygame.Vector2(
             grid_x * tile_size + tile_size // 2,
             grid_y * tile_size + tile_size // 2 
         )
