@@ -1,4 +1,5 @@
 import pygame
+from models.projectiles import Projectile
 
 class Tower:
     def __init__(self, grid_x, grid_y, tile_size):
@@ -23,8 +24,9 @@ class Tower:
         
         target = self._find_target(enemies)
         if target is not None:
-            target.take_damage(self.damage)
             self.current_cooldown = self.cooldown
+            return Projectile(self.pos, target, self.damage)
+        return None
 
     def _find_target(self, enemies):
         for enemy in enemies:
