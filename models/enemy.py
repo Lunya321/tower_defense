@@ -13,8 +13,11 @@ class Enemy:
         self.target_waypoint_index = 1
         self.speed = 100
         self.is_alive = True
-
+        
         self.hp = 100
+        self.reward = 15
+        self.base_damage = 1
+        self.reached_base = False
 
     def take_damage(self, amount):
         self.hp -= amount
@@ -26,6 +29,7 @@ class Enemy:
             return
 
         if self.target_waypoint_index >= len(self.path):
+            self.reached_base = True
             self.is_alive = False
             return
 
