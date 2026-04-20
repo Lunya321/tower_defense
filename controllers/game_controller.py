@@ -2,6 +2,7 @@ from models.map_model import MapModel
 from models.wave_manager import WaveManager
 from models.tower import Tower
 from views.map_renderer import MapRenderer
+from views.hud_view import HudView
 import pygame
 
 class GameController:
@@ -9,12 +10,17 @@ class GameController:
         self.screen = screen
         self.map_model = MapModel()
         self.map_renderer = MapRenderer(self.map_model)
+        self.hud_view = HudView()
         
         self.wave_manager = WaveManager(self.map_model.path, self.map_model.tile_size)
         
         self.enemies = []
         self.towers = []
         self.projectiles = []
+        
+        self.money = 100
+        self.base_hp = 20
+        self.current_wave_number = 1
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -23,10 +29,16 @@ class GameController:
             grid_y = mouse_y // self.map_model.tile_size
             
             if self.map_model.get_tile(grid_x, grid_y) == 0:
-                new_tower = Tower(grid_x, grid_y, self.map_model.tile_size)
-                self.towers.append(new_tower)
+                temp_tower = Tower(grid_x, grid_y, self.map_model.tile_size)
+                
+                if self.money >= temp_tower.cost:
+                    self.money -= temp_tower.cost
+                    self.towers.append(temp_tower)
 
     def update(self, dt):
+        if self.base_hp <= 0:
+            return
+
         new_enemy = self.wave_manager.update(dt)
         if new_enemy:
             self.enemies.append(new_enemy)
@@ -41,6 +53,13 @@ class GameController:
 
         for proj in self.projectiles:
             proj.update(dt)
+            
+        for enemy in self.enemies:
+            if not enemy.is_alive:
+                if enemy.reached_base:
+                    self.base_hp -= enemy.base_damage
+                else:
+                    self.money += enemy.reward
         
         self.enemies = [e for e in self.enemies if e.is_alive]
         self.projectiles = [p for p in self.projectiles if p.is_active]
@@ -58,3 +77,5 @@ class GameController:
             
         for proj in self.projectiles:
             pygame.draw.circle(self.screen, (255, 255, 0), (int(proj.pos.x), int(proj.pos.y)), 5)
+            
+        self.hud_view.render(self.screen, self.base_hp, self.money, self.current_wave_number)
