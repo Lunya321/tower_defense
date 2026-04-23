@@ -9,7 +9,7 @@ class GameController:
     def __init__(self, screen):
         self.screen = screen
         self.map_model = MapModel()
-        self.map_renderer = MapRenderer(self.map_model)
+        self.map_renderer = MapRenderer(self.screen, self.map_model)
         self.hud_view = HudView()
         
         self.wave_manager = WaveManager(self.map_model.path, self.map_model.tile_size)
@@ -66,7 +66,7 @@ class GameController:
 
     def render(self):
         self.screen.fill((0, 0, 0))
-        self.map_renderer.render(self.screen)
+        self.map_renderer.render()
         
         for tower in self.towers:
             pygame.draw.circle(self.screen, (0, 0, 255), (int(tower.pos.x), int(tower.pos.y)), 15)
