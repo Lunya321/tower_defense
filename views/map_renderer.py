@@ -51,8 +51,8 @@ class MapRenderer:
             for x, tile_id in enumerate(row):
                 pos = (x * self.tile_size, y * self.tile_size)
                 
-                if tile_id == 0:
-                    self.screen.blit(self.textures[0], pos)
-                elif tile_id == 1:
+                self.screen.blit(self.textures[0], pos)
+                
+                if tile_id == 1:
                     texture = self._get_path_texture(x, y, grid)
                     self.screen.blit(texture, pos)
