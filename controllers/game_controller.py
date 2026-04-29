@@ -39,10 +39,10 @@ class GameController:
         if self.base_hp <= 0:
             return
 
-        new_enemy = self.wave_manager.update(dt)
+        new_enemy = self.wave_manager.update(dt, len(self.enemies))
         if new_enemy:
             self.enemies.append(new_enemy)
-
+            
         for enemy in self.enemies:
             enemy.update(dt)
             
