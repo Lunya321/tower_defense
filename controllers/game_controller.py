@@ -66,6 +66,7 @@ class GameController:
 
     def render(self):
         self.screen.fill((0, 0, 0))
+        
         self.map_renderer.render()
         
         for tower in self.towers:
@@ -78,4 +79,9 @@ class GameController:
         for proj in self.projectiles:
             pygame.draw.circle(self.screen, (255, 255, 0), (int(proj.pos.x), int(proj.pos.y)), 5)
             
-        self.hud_view.render(self.screen, self.base_hp, self.money, self.current_wave_number)
+        self.hud_view.render(
+            self.screen, 
+            self.base_hp, 
+            self.money, 
+            self.wave_manager.current_wave
+        )
