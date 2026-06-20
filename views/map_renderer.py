@@ -7,43 +7,61 @@ class MapRenderer:
         self.map_model = map_model
         self.tile_size = tile_size
         self.textures = {}
-        self._load_assets()
+        self._load_tiles()
 
-    def _load_assets(self):
-        base_path = os.path.join("assets", "img", "tiles")
+    def _load_tiles(self):
+        base_path = os.path.join("assets", "images", "tiles")
+        scale_size = (self.tile_size, self.tile_size)
         
-        self.textures[0] = self._load_and_scale(os.path.join(base_path, "land.png"))
+        tile_files = {
+            "grass_1": "grass_1.png",
+            "grass_2": "grass_2.png",
+            "grass_3": "grass_3.png",
+            "grass_4": "grass_4.png",
+            "grass_flower": "grass_flower.png",
+            "grass_bush": "grass_bush.png",
+            "road_h": "road_h.png",
+            "road_v": "road_v.png",
+            "road_rb": "road_rb.png",
+            "road_lb": "road_lb.png",
+            "road_rt": "road_rt.png",
+            "road_lt": "road_lt.png"
+        }
         
-        self.textures["road_v"] = self._load_and_scale(os.path.join(base_path, "road_5.png"))
-        self.textures["road_h"] = self._load_and_scale(os.path.join(base_path, "road_6.png"))
-        self.textures["road_rb"] = self._load_and_scale(os.path.join(base_path, "road_1.png"))
-        self.textures["road_lb"] = self._load_and_scale(os.path.join(base_path, "road_2.png"))
-        self.textures["road_rt"] = self._load_and_scale(os.path.join(base_path, "road_3.png"))
-        self.textures["road_lt"] = self._load_and_scale(os.path.join(base_path, "road_4.png"))
+        for key, filename in tile_files.items():
+            path = os.path.join(base_path, filename)
+            if os.path.exists(path):
+                img = pygame.image.load(path).convert_alpha()
+                self.textures[key] = pygame.transform.scale(img, scale_size)
+            else:
+                fallback = pygame.Surface(scale_size)
+                fallback.fill((34, 139, 34) if "grass" in key else (139, 69, 19))
+                self.textures[key] = fallback
 
-    def _load_and_scale(self, path):
-        if os.path.exists(path):
-            img = pygame.image.load(path).convert_alpha()
-            return pygame.transform.smoothscale(img, (self.tile_size, self.tile_size))
-        return pygame.Surface((self.tile_size, self.tile_size))
+    def _get_grass_variant(self, x, y):
+        decor_val = (x * 73 + y * 37) % 100
+        if decor_val < 3:
+            return self.textures["grass_flower"]
+        elif decor_val < 6:
+            return self.textures["grass_bush"]
+            
+        grass_val = (x * 101 + y * 13) % 4
+        return self.textures[f"grass_{grass_val + 1}"]
 
-    def _get_path_texture(self, x, y, grid):
-        height = len(grid)
-        width = len(grid[0])
-        
+    def _get_path_texture_key(self, x, y, grid):
+        height, width = len(grid), len(grid[0])
         top = y > 0 and grid[y-1][x] == 1
         bottom = y < height - 1 and grid[y+1][x] == 1
         left = x > 0 and grid[y][x-1] == 1
         right = x < width - 1 and grid[y][x+1] == 1
 
-        if top and bottom: return self.textures["road_v"]
-        if left and right: return self.textures["road_h"]
-        if bottom and right: return self.textures["road_rb"]
-        if bottom and left: return self.textures["road_lb"]
-        if top and right: return self.textures["road_rt"]
-        if top and left: return self.textures["road_lt"]
-        
-        return self.textures["road_h"]
+        if top and bottom: return "road_v"
+        if left and right: return "road_h"
+        if bottom and right: return "road_rb"
+        if bottom and left: return "road_lb"
+        if top and right: return "road_rt"
+        if top and left: return "road_lt"
+        return "road_h"
 
     def render(self):
         grid = self.map_model.grid
@@ -51,8 +69,9 @@ class MapRenderer:
             for x, tile_id in enumerate(row):
                 pos = (x * self.tile_size, y * self.tile_size)
                 
-                self.screen.blit(self.textures[0], pos)
+                grass_tile = self._get_grass_variant(x, y)
+                self.screen.blit(grass_tile, pos)
                 
                 if tile_id == 1:
-                    texture = self._get_path_texture(x, y, grid)
-                    self.screen.blit(texture, pos)
+                    key = self._get_path_texture_key(x, y, grid)
+                    self.screen.blit(self.textures[key], pos)
