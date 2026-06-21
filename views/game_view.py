@@ -10,7 +10,10 @@ class GameView:
 
     def draw_tower(self, tower, target_enemy=None):
         type_name = getattr(tower, "type_name", None)
-        sprite = self.assets.towers.get(type_name) if type_name else None
+        sprite = None
+
+        if hasattr(self.assets, "towers") and self.assets.towers:
+            sprite = self.assets.towers.get(type_name)
 
         if not sprite:
             pygame.draw.circle(
@@ -33,7 +36,10 @@ class GameView:
 
     def draw_enemy(self, enemy):
         type_name = getattr(enemy, "type_name", "basic")
-        sprite = self.assets.enemies.get(type_name) if type_name else None
+        sprite = None
+
+        if hasattr(self.assets, "enemies") and self.assets.enemies:
+            sprite = self.assets.enemies.get(type_name)
 
         if not sprite:
             pygame.draw.circle(
@@ -49,6 +55,53 @@ class GameView:
         enemy_rect = rotated_sprite.get_rect(center=enemy.pos)
         self.screen.blit(rotated_sprite, enemy_rect.topleft)
         self._draw_health_bar(enemy)
+
+    def draw_projectile(self, proj):
+        type_name = getattr(proj, "type_name", "arrow")
+        sprite = None
+
+        if hasattr(self.assets, "projectiles") and self.assets.projectiles:
+            sprite = self.assets.projectiles.get(type_name)
+
+        if not sprite:
+            color = (255, 255, 0)
+            if type_name == "snip":
+                color = (200, 200, 250)
+            elif type_name == "cannonball":
+                color = (50, 50, 50)
+            elif type_name == "ice":
+                color = (100, 200, 255)
+
+            pygame.draw.circle(
+                self.screen, color, (int(proj.pos.x), int(proj.pos.y)), 5
+            )
+            return
+
+        rotated_sprite = pygame.transform.rotate(sprite, proj.angle)
+        proj_rect = rotated_sprite.get_rect(center=proj.pos)
+        self.screen.blit(rotated_sprite, proj_rect.topleft)
+
+    def draw_effect(self, effect):
+        type_name = getattr(effect, "type_name", None)
+        sprite = None
+
+        if hasattr(self.assets, "effects") and self.assets.effects:
+            sprite = self.assets.effects.get(type_name)
+
+        if not sprite:
+            color = (150, 150, 150)
+            if type_name == "cannonball":
+                color = (255, 100, 0)
+            elif type_name == "ice":
+                color = (0, 255, 255)
+
+            pygame.draw.circle(
+                self.screen, color, (int(effect.pos.x), int(effect.pos.y)), 12
+            )
+            return
+
+        effect_rect = sprite.get_rect(center=effect.pos)
+        self.screen.blit(sprite, effect_rect.topleft)
 
     def _draw_health_bar(self, enemy):
         max_hp = getattr(enemy, "max_hp", 100)

@@ -29,6 +29,7 @@ class GameController:
 
         self.money = 100
         self.base_hp = 20
+        self.current_wave_number = 1
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -51,8 +52,6 @@ class GameController:
 
         new_enemy = self.wave_manager.update(dt, len(self.enemies))
         if new_enemy:
-            if not hasattr(new_enemy, "type_name"):
-                new_enemy.type_name = "basic"
             self.enemies.append(new_enemy)
 
         for enemy in self.enemies:
@@ -96,9 +95,7 @@ class GameController:
             self.game_view.draw_enemy(enemy)
 
         for proj in self.projectiles:
-            pygame.draw.circle(
-                self.screen, (255, 255, 0), (int(proj.pos.x), int(proj.pos.y)), 5
-            )
+            self.game_view.draw_projectile(proj)
 
         self.hud_view.render(
             self.screen,

@@ -4,27 +4,79 @@ import pygame
 
 class AssetManager:
 
-    def __init__(self, tile_size):
+    def __init__(self, tile_size=40):
         self.tile_size = tile_size
         self.towers = {}
         self.enemies = {}
-        self._load_assets()
+        self.projectiles = {}
+        self.effects = {}
+        self.load_assets()
 
-    def _load_assets(self):
-        base_path = os.path.join("assets", "images")
-        tower_types = ["arrow", "cannon", "slow", "sniper"]
-        for t_type in tower_types:
-            path = os.path.join(base_path, "towers", f"{t_type}.png")
-            if os.path.exists(path):
-                img = pygame.image.load(path).convert_alpha()
-                self.towers[t_type] = pygame.transform.scale(
-                    img, (self.tile_size, self.tile_size)
-                )
-        enemy_types = ["basic", "fast", "tank", "healer"]
-        for e_type in enemy_types:
-            path = os.path.join(base_path, "enemies", f"{e_type}.png")
-            if os.path.exists(path):
-                img = pygame.image.load(path).convert_alpha()
-                self.enemies[e_type] = pygame.transform.scale(
-                    img, (self.tile_size, self.tile_size)
-                )
+    def load_assets(self):
+        img_base = os.path.join("assets", "images")
+
+        proj_dir = os.path.join(img_base, "projectiles")
+        try:
+            arrow_img = pygame.image.load(
+                os.path.join(proj_dir, "arrow.png")
+            ).convert_alpha()
+            snip_img = pygame.image.load(
+                os.path.join(proj_dir, "snip.png")
+            ).convert_alpha()
+            cannon_img = pygame.image.load(
+                os.path.join(proj_dir, "cannonball.png")
+            ).convert_alpha()
+            ice_img = pygame.image.load(
+                os.path.join(proj_dir, "ice.png")
+            ).convert_alpha()
+
+            self.projectiles["arrow"] = pygame.transform.scale(
+                arrow_img, (28, 12)
+            )
+            self.projectiles["snip"] = pygame.transform.scale(
+                snip_img, (32, 12)
+            )
+            self.projectiles["cannonball"] = pygame.transform.scale(
+                cannon_img, (14, 14)
+            )
+            self.projectiles["ice"] = pygame.transform.scale(ice_img, (16, 16))
+        except Exception:
+            pass
+
+        towers_dir = os.path.join(img_base, "towers")
+        try:
+            tower_img = pygame.image.load(
+                os.path.join(towers_dir, "arrow.png")
+            ).convert_alpha()
+            self.towers["arrow"] = pygame.transform.scale(
+                tower_img, (self.tile_size, self.tile_size)
+            )
+        except Exception:
+            pass
+
+        enemies_dir = os.path.join(img_base, "enemies")
+        try:
+            enemy_img = pygame.image.load(
+                os.path.join(enemies_dir, "basic.png")
+            ).convert_alpha()
+            self.enemies["basic"] = pygame.transform.scale(
+                enemy_img, (self.tile_size, self.tile_size)
+            )
+        except Exception:
+            pass
+
+        eff_dir = os.path.join(img_base, "effects")
+        try:
+            cannon_eff = pygame.image.load(
+                os.path.join(eff_dir, "cannonball_effect.png")
+            ).convert_alpha()
+            ice_eff = pygame.image.load(
+                os.path.join(eff_dir, "ice_effect.png")
+            ).convert_alpha()
+
+            self.effects["cannonball"] = pygame.transform.scale(
+                cannon_eff, (24, 24)
+            )
+            self.effects["ice"] = pygame.transform.scale(ice_eff, (24, 24))
+        except Exception:
+            pass
