@@ -62,13 +62,14 @@ class GameController:
         new_enemy = self.wave_manager.update(dt, len(self.enemies))
         if new_enemy:
             self.enemies.append(new_enemy)
+        self.spatial_hash.clear()
+        for enemy in self.enemies:
+            self.spatial_hash.insert(enemy)
         for enemy in self.enemies:
             nearby_enemies = self.spatial_hash.get_nearby(
                 enemy.pos.x, enemy.pos.y, 100
             )
             enemy.update(dt, nearby_enemies)
-        for enemy in self.enemies:
-            self.spatial_hash.insert(enemy)
         for tower in self.towers:
             nearby_enemies = self.spatial_hash.get_nearby(
                 tower.pos.x, tower.pos.y, tower.range

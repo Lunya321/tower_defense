@@ -7,5 +7,7 @@ class TankEnemy(Enemy):
         super().__init__(path, tile_size)
         self.type_name = "tank"
         self.speed = 50
+        self.base_speed = 50
         self.hp = 300
+        self.max_hp = 300
         self.reward = 40

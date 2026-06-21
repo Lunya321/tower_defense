@@ -1,4 +1,5 @@
 from models.tower import Tower
+from models.projectiles import Arrow
 
 class ArrowTower(Tower):
     def __init__(self, grid_x, grid_y, tile_size):
@@ -6,5 +7,8 @@ class ArrowTower(Tower):
         self.type_name = "arrow"
         self.range = 120
         self.damage = 20
-        self.cooldown = 0.5   
+        self.cooldown = 0.5
         self.cost = 50
+
+    def _create_projectile(self):
+        return Arrow(self.pos, self.target, self.damage)

@@ -1,9 +1,7 @@
 import pygame
-from models.projectiles import Arrow, SniperArrow, Cannonball, IceProjectile
-
+from models.projectiles import Arrow
 
 class Tower:
-
     def __init__(self, grid_x, grid_y, tile_size):
         self.grid_x = grid_x
         self.grid_y = grid_y
@@ -21,12 +19,18 @@ class Tower:
         self.target = None
 
     def _find_target(self, enemies):
+        enemies_in_range = []
         for enemy in enemies:
             if enemy.is_alive:
                 distance = self.pos.distance_to(enemy.pos)
                 if distance <= self.range:
-                    return enemy
-        return None
+                    enemies_in_range.append(enemy)
+
+        if not enemies_in_range:
+            return None
+
+        enemies_in_range.sort(key=lambda e: e.target_waypoint_index, reverse=True)
+        return enemies_in_range[0]
 
     def update(self, dt, enemies):
         if self.timer > 0:
