@@ -1,6 +1,7 @@
 import sys
 import pygame
 from controllers.game_controller import GameController
+from views.asset_manager import AssetManager
 
 
 def main():
@@ -9,7 +10,8 @@ def main():
     pygame.display.set_caption("Bastion Break")
     clock = pygame.time.Clock()
 
-    game_controller = GameController(screen)
+    asset_manager = AssetManager()
+    game_controller = GameController(screen, asset_manager)
 
     running = True
     while running:
