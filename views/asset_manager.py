@@ -1,9 +1,7 @@
 import os
 import pygame
 
-
 class AssetManager:
-
     def __init__(self, tile_size=40):
         self.tile_size = tile_size
         self.towers = {}
@@ -55,15 +53,17 @@ class AssetManager:
             pass
 
         enemies_dir = os.path.join(img_base, "enemies")
-        try:
-            enemy_img = pygame.image.load(
-                os.path.join(enemies_dir, "basic.png")
-            ).convert_alpha()
-            self.enemies["basic"] = pygame.transform.scale(
-                enemy_img, (self.tile_size, self.tile_size)
-            )
-        except Exception:
-            pass
+        enemy_types = ["basic", "fast", "tank", "healer"]
+        for enemy_type in enemy_types:
+            try:
+                enemy_img = pygame.image.load(
+                    os.path.join(enemies_dir, f"{enemy_type}.png")
+                ).convert_alpha()
+                self.enemies[enemy_type] = pygame.transform.scale(
+                    enemy_img, (self.tile_size, self.tile_size)
+                )
+            except Exception:
+                pass
 
         eff_dir = os.path.join(img_base, "effects")
         try:
