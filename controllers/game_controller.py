@@ -1,16 +1,14 @@
 import pygame
 from models.map_model import MapModel
 from models.wave_manager import WaveManager
-from models.towers import ArrowTower
+from models.towers import ArrowTower, CannonTower, SlowTower, SniperTower
 from views.map_renderer import MapRenderer
 from views.hud_view import HudView
-from views.asset_manager import AssetManager
+from views.tower_panel_view import TowerPanelView
 from views.game_view import GameView
 from algorithms.spatial_hash import SpatialHash
 
-
 class GameController:
-
     def __init__(self, screen, asset_manager):
         self.screen = screen
         self.asset_manager = asset_manager
@@ -18,6 +16,7 @@ class GameController:
         self.asset_manager.tile_size = self.map_model.tile_size
         self.map_renderer = MapRenderer(self.screen, self.map_model)
         self.hud_view = HudView()
+        self.tower_panel = TowerPanelView(self.screen, self.asset_manager)
         self.game_view = GameView(self.screen, self.asset_manager)
         self.wave_manager = WaveManager(
             self.map_model.path, self.map_model.tile_size
@@ -28,6 +27,12 @@ class GameController:
         self.projectiles = []
         self.money = 100
         self.base_hp = 20
+        self.tower_factories = {
+            "arrow": ArrowTower,
+            "cannon": CannonTower,
+            "slow": SlowTower,
+            "sniper": SniperTower,
+        }
 
     def start_next_level(self):
         self.map_model = MapModel()
@@ -43,15 +48,24 @@ class GameController:
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_x, mouse_y = pygame.mouse.get_pos()
+            
+            tower_type = self.tower_panel.handle_click((mouse_x, mouse_y))
+            if tower_type:
+                return
+
             grid_x = mouse_x // self.map_model.tile_size
             grid_y = mouse_y // self.map_model.tile_size
+            
             if self.map_model.get_tile(grid_x, grid_y) == 0:
-                temp_tower = ArrowTower(
-                    grid_x, grid_y, self.map_model.tile_size
-                )
-                if self.money >= temp_tower.cost:
-                    self.money -= temp_tower.cost
-                    self.towers.append(temp_tower)
+                selected_type = self.tower_panel.get_selected_tower()
+                tower_factory = self.tower_factories.get(selected_type)
+                if tower_factory:
+                    temp_tower = tower_factory(
+                        grid_x, grid_y, self.map_model.tile_size
+                    )
+                    if self.money >= temp_tower.cost:
+                        self.money -= temp_tower.cost
+                        self.towers.append(temp_tower)
 
     def update(self, dt):
         if self.base_hp <= 0:
@@ -62,14 +76,11 @@ class GameController:
         new_enemy = self.wave_manager.update(dt, len(self.enemies))
         if new_enemy:
             self.enemies.append(new_enemy)
+        for enemy in self.enemies:
+            enemy.update(dt)
         self.spatial_hash.clear()
         for enemy in self.enemies:
             self.spatial_hash.insert(enemy)
-        for enemy in self.enemies:
-            nearby_enemies = self.spatial_hash.get_nearby(
-                enemy.pos.x, enemy.pos.y, 100
-            )
-            enemy.update(dt, nearby_enemies)
         for tower in self.towers:
             nearby_enemies = self.spatial_hash.get_nearby(
                 tower.pos.x, tower.pos.y, tower.range
@@ -111,3 +122,4 @@ class GameController:
             self.money,
             self.wave_manager.current_wave,
         )
+        self.tower_panel.render(self.money)

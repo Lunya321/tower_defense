@@ -42,15 +42,17 @@ class AssetManager:
             pass
 
         towers_dir = os.path.join(img_base, "towers")
-        try:
-            tower_img = pygame.image.load(
-                os.path.join(towers_dir, "arrow.png")
-            ).convert_alpha()
-            self.towers["arrow"] = pygame.transform.scale(
-                tower_img, (self.tile_size, self.tile_size)
-            )
-        except Exception:
-            pass
+        tower_types = ["arrow", "cannon", "slow", "sniper"]
+        for tower_type in tower_types:
+            try:
+                tower_img = pygame.image.load(
+                    os.path.join(towers_dir, f"{tower_type}.png")
+                ).convert_alpha()
+                self.towers[tower_type] = pygame.transform.scale(
+                    tower_img, (self.tile_size, self.tile_size)
+                )
+            except Exception:
+                pass
 
         enemies_dir = os.path.join(img_base, "enemies")
         enemy_types = ["basic", "fast", "tank", "healer"]
