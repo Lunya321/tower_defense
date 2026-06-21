@@ -1,23 +1,25 @@
+import math
 import pygame
 
+
 class Enemy:
+
     def __init__(self, path, tile_size):
         self.path = path
         self.tile_size = tile_size
-        
         self.pos = pygame.Vector2(
             path[0][0] * tile_size + tile_size // 2,
-            path[0][1] * tile_size + tile_size // 2
+            path[0][1] * tile_size + tile_size // 2,
         )
-        
         self.target_waypoint_index = 1
         self.speed = 100
         self.is_alive = True
-        
         self.hp = 100
         self.reward = 15
         self.base_damage = 1
         self.reached_base = False
+        self.angle = 0
+        self.type_name = "basic"
 
     def take_damage(self, amount):
         self.hp -= amount
@@ -36,11 +38,14 @@ class Enemy:
         target_tile = self.path[self.target_waypoint_index]
         target_pos = pygame.Vector2(
             target_tile[0] * self.tile_size + self.tile_size // 2,
-            target_tile[1] * self.tile_size + self.tile_size // 2
+            target_tile[1] * self.tile_size + self.tile_size // 2,
         )
 
         move_vec = target_pos - self.pos
         distance = move_vec.length()
+
+        if distance > 0:
+            self.angle = math.degrees(math.atan2(-move_vec.y, move_vec.x)) + 90
 
         if distance <= self.speed * dt:
             self.pos = target_pos

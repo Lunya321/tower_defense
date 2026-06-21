@@ -1,4 +1,4 @@
-from models.enemy import Enemy
+from models.enemies import BasicEnemy
 
 class WaveManager:
     def __init__(self, path, tile_size):
@@ -33,7 +33,7 @@ class WaveManager:
             if self.spawn_timer >= self.spawn_delay:
                 self.spawn_timer = 0.0
                 self.enemies_queue.pop()
-                return Enemy(self.path, self.tile_size)
+                return BasicEnemy(self.path, self.tile_size)
         else:
             if active_enemies_count == 0:
                 self.is_active = False

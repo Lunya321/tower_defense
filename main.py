@@ -1,6 +1,7 @@
-import pygame
 import sys
+import pygame
 from controllers.game_controller import GameController
+
 
 def main():
     pygame.init()
@@ -12,7 +13,7 @@ def main():
 
     running = True
     while running:
-        dt = clock.tick(60) / 1000.0 
+        dt = clock.tick(60) / 1000.0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -26,6 +27,7 @@ def main():
 
     pygame.quit()
     sys.exit()
+
 
 if __name__ == "__main__":
     main()
