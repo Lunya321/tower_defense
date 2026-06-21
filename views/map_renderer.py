@@ -1,6 +1,5 @@
 import pygame
 import os
-
 class MapRenderer:
     def __init__(self, screen, map_model, tile_size=40):
         self.screen = screen
@@ -50,10 +49,10 @@ class MapRenderer:
 
     def _get_path_texture_key(self, x, y, grid):
         height, width = len(grid), len(grid[0])
-        top = y > 0 and grid[y-1][x] == 1
-        bottom = y < height - 1 and grid[y+1][x] == 1
-        left = x > 0 and grid[y][x-1] == 1
-        right = x < width - 1 and grid[y][x+1] == 1
+        top = y > 0 and grid[y-1][x] in {1, 3, 4}
+        bottom = y < height - 1 and grid[y+1][x] in {1, 3, 4}
+        left = x > 0 and grid[y][x-1] in {1, 3, 4}
+        right = x < width - 1 and grid[y][x+1] in {1, 3, 4}
 
         if top and bottom: return "road_v"
         if left and right: return "road_h"
@@ -75,3 +74,9 @@ class MapRenderer:
                 if tile_id == 1:
                     key = self._get_path_texture_key(x, y, grid)
                     self.screen.blit(self.textures[key], pos)
+                elif tile_id == 3:
+                    spawn_key = self._get_path_texture_key(x, y, grid)
+                    self.screen.blit(self.textures.get(spawn_key, self.textures["road_h"]), pos)
+                elif tile_id == 4:
+                    base_key = self._get_path_texture_key(x, y, grid)
+                    self.screen.blit(self.textures.get(base_key, self.textures["road_h"]), pos)
