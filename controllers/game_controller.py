@@ -63,8 +63,10 @@ class GameController:
         if new_enemy:
             self.enemies.append(new_enemy)
         for enemy in self.enemies:
-            enemy.update(dt)
-        self.spatial_hash.clear()
+            nearby_enemies = self.spatial_hash.get_nearby(
+                enemy.pos.x, enemy.pos.y, 100
+            )
+            enemy.update(dt, nearby_enemies)
         for enemy in self.enemies:
             self.spatial_hash.insert(enemy)
         for tower in self.towers:
