@@ -45,19 +45,16 @@ class WaveFunctionCollapse:
             [{0, 2} for _ in range(self.width)] for _ in range(self.height)
         ]
         
-        spawn_y = self.height // 2
-        base_y = self.height // 2
-        
-        spawn_pos = (0, spawn_y)
-        base_pos = (self.width - 1, base_y)
+        spawn_pos = (0, self.height // 2)
+        base_pos = (self.width - 1, self.height // 2)
 
         path = self._generate_winding_path(spawn_pos, base_pos)
         
         for x, y in path:
             grid[y][x] = {1}
 
-        grid[spawn_y][0] = {3}
-        grid[base_y][self.width - 1] = {4}
+        grid[spawn_pos[1]][spawn_pos[0]] = {3}
+        grid[base_pos[1]][base_pos[0]] = {4}
 
         queue = [
             (x, y)

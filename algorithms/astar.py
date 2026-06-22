@@ -6,7 +6,6 @@ def manhattan_distance(p1, p2):
 def a_star_search(grid_model, start, goal):
     frontier = []
     heapq.heappush(frontier, (0, start))
-    
     came_from = {start: None}
     cost_so_far = {start: 0}
 
@@ -19,7 +18,8 @@ def a_star_search(grid_model, start, goal):
         for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
             next_node = (current[0] + dx, current[1] + dy)
             
-            if grid_model.get_tile(*next_node) == 1:
+            tile = grid_model.get_tile(*next_node)
+            if tile in {1, 3, 4}:
                 new_cost = cost_so_far[current] + 1
                 
                 if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
@@ -36,5 +36,5 @@ def a_star_search(grid_model, start, goal):
     while curr is not None:
         path.append(curr)
         curr = came_from[curr]
-    
+
     return path[::-1]
