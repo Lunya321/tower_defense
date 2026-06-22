@@ -8,4 +8,3 @@ class FastEnemy(Enemy):
         self.base_speed = 160
         self.hp = 60
         self.max_hp = 60
-        self.reward = 10

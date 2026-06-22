@@ -28,6 +28,17 @@ class InputHandler:
             if event.key == pygame.K_ESCAPE:
                 self._handle_escape_key()
 
+    def _is_click_in_ui(self, mouse_pos):
+        if self.tower_info_view.selected_tower:
+            panel_x = 620
+            panel_y = 50
+            panel_width = 170
+            panel_height = 180
+            panel_rect = pygame.Rect(panel_x, panel_y, panel_width, panel_height)
+            if panel_rect.collidepoint(mouse_pos):
+                return True
+        return False
+
     def _handle_mouse_click(self, mouse_pos):
         state = self.state_manager.state
 
@@ -76,48 +87,49 @@ class InputHandler:
             return
 
         if state == GameState.PLAYING:
-            self._handle_playing_click(mouse_pos)
-
-    def _handle_playing_click(self, mouse_pos):
-        tower_action = self.tower_info_view.handle_click(mouse_pos)
-        if tower_action == "upgrade":
-            tower = self.tower_info_view.selected_tower
-            upgrade_cost = int(tower.cost * 0.7)
-            if self.state_manager.money >= upgrade_cost:
-                self.state_manager.money -= upgrade_cost
-                tower.damage = int(tower.damage * 1.5)
-                tower.range = int(tower.range * 1.2)
-                tower.cost += upgrade_cost
-            return
-        elif tower_action == "sell":
-            tower = self.tower_info_view.selected_tower
-            sell_value = int(tower.cost * 0.5)
-            self.state_manager.money += sell_value
-            self.state_manager.towers.remove(tower)
-            self.tower_info_view.close()
-            return
-
-        tower_type = self.tower_panel_view.handle_click(mouse_pos)
-        if tower_type:
-            return
-
-        grid_x = mouse_pos[0] // self.state_manager.map_model.tile_size
-        grid_y = mouse_pos[1] // self.state_manager.map_model.tile_size
-
-        if self.state_manager.map_model.get_tile(grid_x, grid_y) == 0:
-            for tower in self.state_manager.towers:
-                if tower.grid_x == grid_x and tower.grid_y == grid_y:
-                    self.tower_info_view.selected_tower = tower
+            if self._is_click_in_ui(mouse_pos):
+                tower_action = self.tower_info_view.handle_click(mouse_pos)
+                if tower_action == "close":
                     return
+                if tower_action == "upgrade":
+                    tower = self.tower_info_view.selected_tower
+                    upgrade_cost = int(tower.cost * 0.7)
+                    if self.state_manager.money >= upgrade_cost:
+                        self.state_manager.money -= upgrade_cost
+                        tower.damage = int(tower.damage * 1.5)
+                        tower.range = int(tower.range * 1.2)
+                        tower.cost += upgrade_cost
+                    return
+                elif tower_action == "sell":
+                    tower = self.tower_info_view.selected_tower
+                    sell_value = int(tower.cost * 0.5)
+                    self.state_manager.money += sell_value
+                    self.state_manager.towers.remove(tower)
+                    self.tower_info_view.close()
+                    return
+                return
 
-            selected_type = self.tower_panel_view.get_selected_tower()
-            tower_factory = self.tower_factories.get(selected_type)
-            if tower_factory:
-                temp_tower = tower_factory(grid_x, grid_y, self.state_manager.map_model.tile_size)
-                if self.state_manager.money >= temp_tower.cost:
-                    self.state_manager.money -= temp_tower.cost
-                    self.state_manager.towers.append(temp_tower)
-                    self.sound_manager.play_sfx("tower_build")
+            tower_type = self.tower_panel_view.handle_click(mouse_pos)
+            if tower_type:
+                return
+
+            grid_x = mouse_pos[0] // self.state_manager.map_model.tile_size
+            grid_y = mouse_pos[1] // self.state_manager.map_model.tile_size
+
+            if self.state_manager.map_model.get_tile(grid_x, grid_y) == 0:
+                for tower in self.state_manager.towers:
+                    if tower.grid_x == grid_x and tower.grid_y == grid_y:
+                        self.tower_info_view.selected_tower = tower
+                        return
+
+                selected_type = self.tower_panel_view.get_selected_tower()
+                tower_factory = self.tower_factories.get(selected_type)
+                if tower_factory:
+                    temp_tower = tower_factory(grid_x, grid_y, self.state_manager.map_model.tile_size)
+                    if self.state_manager.money >= temp_tower.cost:
+                        self.state_manager.money -= temp_tower.cost
+                        self.state_manager.towers.append(temp_tower)
+                        self.sound_manager.play_sfx("tower_build")
 
     def _handle_escape_key(self):
         if self.state_manager.state == GameState.PLAYING:

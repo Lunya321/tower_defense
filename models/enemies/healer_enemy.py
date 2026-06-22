@@ -8,4 +8,3 @@ class HealerEnemy(Enemy):
         self.base_speed = 80
         self.hp = 120
         self.max_hp = 120
-        self.reward = 10

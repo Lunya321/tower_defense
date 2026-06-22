@@ -29,6 +29,8 @@ class StateManager:
         self.enemies_killed = 0
         self.gold_earned = 0
         self.current_level = 1
+        self.wave_rewards = {1: 50, 2: 50, 3: 50, 4: 50, 5: 100}
+        self.level_reward = 100
 
     def start_new_game(self):
         self.map_model = MapModel()
@@ -59,6 +61,7 @@ class StateManager:
         self.base_hp = 20
         self.enemies_killed = 0
         self.gold_earned = 0
+        self.money += self.level_reward
         self.current_level += 1
         self.state = GameState.PLAYING
 
@@ -82,9 +85,16 @@ class StateManager:
             self.state = GameState.VICTORY
             return
 
+        previous_wave = self.wave_manager.current_wave
+
         new_enemy = self.wave_manager.update(dt, len(self.enemies))
         if new_enemy:
             self.enemies.append(new_enemy)
+
+        if self.wave_manager.current_wave > previous_wave and previous_wave in self.wave_rewards:
+            reward = self.wave_rewards[previous_wave]
+            self.money += reward
+            self.gold_earned += reward
 
         spatial_hash.clear()
         for enemy in self.enemies:
@@ -119,9 +129,7 @@ class StateManager:
                     self.base_hp -= enemy.base_damage
                     sound_manager.play_sfx("base_hit")
                 else:
-                    self.money += enemy.reward
                     self.enemies_killed += 1
-                    self.gold_earned += enemy.reward
                     sound_manager.play_sfx("enemy_death")
 
         self.enemies = [e for e in self.enemies if e.is_alive]
