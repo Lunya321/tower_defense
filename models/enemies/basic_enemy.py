@@ -8,4 +8,4 @@ class BasicEnemy(Enemy):
         self.base_speed = 90
         self.hp = 100
         self.max_hp = 100
-        self.reward = 15
+        self.reward = 5

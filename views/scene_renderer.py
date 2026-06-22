@@ -14,7 +14,9 @@ class SceneRenderer:
         for tower in towers:
             target = getattr(tower, "target", None)
             self.game_view.draw_tower(tower, target)
-            pygame.draw.circle(self.screen, (255, 255, 255), (int(tower.pos.x), int(tower.pos.y)), tower.range, 1)
+            range_surface = pygame.Surface((tower.range * 2, tower.range * 2), pygame.SRCALPHA)
+            pygame.draw.circle(range_surface, (255, 255, 255, 40), (tower.range, tower.range), tower.range)
+            self.screen.blit(range_surface, (int(tower.pos.x) - tower.range, int(tower.pos.y) - tower.range))
         for enemy in enemies:
             self.game_view.draw_enemy(enemy)
         for proj in projectiles:

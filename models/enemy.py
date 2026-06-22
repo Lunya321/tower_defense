@@ -23,12 +23,11 @@ class Enemy:
         self.is_alive = True
         self.hp = 100
         self.max_hp = 100
-        self.reward = 15
-        self.base_damage = 1
+        self.reward = 5
+        self.base_damage = 2
         self.reached_base = False
         self.angle = 0
         self.type_name = "basic"
-        
         self.state = EnemyFSM.MOVING
         self.slow_factor = 1.0
         self.slow_timer = 0.0

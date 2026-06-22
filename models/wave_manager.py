@@ -24,23 +24,23 @@ class WaveManager:
 
     def _generate_wave_enemies(self):
         enemies = []
-        basic_count = 3 + (self.current_wave * 2) + (self.level * 2)
+        basic_count = 5 + (self.current_wave * 3) + (self.level * 4)
         
         for _ in range(basic_count):
             enemies.append("basic")
         
         if self.current_wave >= 2 or self.level >= 2:
-            fast_count = self.current_wave + self.level
+            fast_count = self.current_wave + self.level + 2
             for _ in range(fast_count):
                 enemies.append("fast")
         
         if self.current_wave >= 3 or self.level >= 2:
-            tank_count = max(1, self.current_wave - 2 + self.level)
+            tank_count = max(1, self.current_wave - 2 + self.level + 1)
             for _ in range(tank_count):
                 enemies.append("tank")
         
         if self.current_wave >= 4 or self.level >= 3:
-            healer_count = max(1, self.current_wave - 3 + self.level - 1)
+            healer_count = max(1, self.current_wave - 3 + self.level)
             for _ in range(healer_count):
                 enemies.append("healer")
         
