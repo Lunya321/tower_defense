@@ -10,7 +10,9 @@ from views.menu_view import MenuView
 from views.pause_menu_view import PauseMenuView
 from views.game_over_view import GameOverView
 from views.tower_info_view import TowerInfoView
+from views.sound_manager import SoundManager
 from algorithms.spatial_hash import SpatialHash
+
 
 class GameState:
     MENU = "menu"
@@ -18,10 +20,12 @@ class GameState:
     PAUSED = "paused"
     GAME_OVER = "game_over"
 
+
 class GameController:
-    def __init__(self, screen, asset_manager):
+    def __init__(self, screen, asset_manager, sound_manager):
         self.screen = screen
         self.asset_manager = asset_manager
+        self.sound_manager = sound_manager
         self.state = GameState.MENU
         self.map_model = None
         self.map_renderer = None
@@ -52,9 +56,7 @@ class GameController:
         self.map_model = MapModel()
         self.asset_manager.tile_size = self.map_model.tile_size
         self.map_renderer = MapRenderer(self.screen, self.map_model)
-        self.wave_manager = WaveManager(
-            self.map_model.path, self.map_model.tile_size
-        )
+        self.wave_manager = WaveManager(self.map_model.path, self.map_model.tile_size)
         self.enemies.clear()
         self.towers.clear()
         self.projectiles.clear()
@@ -63,6 +65,7 @@ class GameController:
         self.enemies_killed = 0
         self.gold_earned = 0
         self.state = GameState.PLAYING
+        self.sound_manager.play_music("background_music.ogg")
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -128,12 +131,11 @@ class GameController:
                     selected_type = self.tower_panel.get_selected_tower()
                     tower_factory = self.tower_factories.get(selected_type)
                     if tower_factory:
-                        temp_tower = tower_factory(
-                            grid_x, grid_y, self.map_model.tile_size
-                        )
+                        temp_tower = tower_factory(grid_x, grid_y, self.map_model.tile_size)
                         if self.money >= temp_tower.cost:
                             self.money -= temp_tower.cost
                             self.towers.append(temp_tower)
+                            self.sound_manager.play_sfx("tower_build")
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -148,10 +150,12 @@ class GameController:
 
         if self.base_hp <= 0:
             self.state = GameState.GAME_OVER
+            self.sound_manager.play_sfx("game_over")
             return
 
         if self.wave_manager.current_wave > 5 and len(self.enemies) == 0:
             self.state = GameState.GAME_OVER
+            self.sound_manager.play_sfx("game_over")
             return
 
         new_enemy = self.wave_manager.update(dt, len(self.enemies))
@@ -163,18 +167,20 @@ class GameController:
             self.spatial_hash.insert(enemy)
 
         for enemy in self.enemies:
-            nearby_enemies = self.spatial_hash.get_nearby(
-                enemy.pos.x, enemy.pos.y, 100
-            )
+            nearby_enemies = self.spatial_hash.get_nearby(enemy.pos.x, enemy.pos.y, 100)
             enemy.update(dt, nearby_enemies)
 
         for tower in self.towers:
-            nearby_enemies = self.spatial_hash.get_nearby(
-                tower.pos.x, tower.pos.y, tower.range
-            )
+            nearby_enemies = self.spatial_hash.get_nearby(tower.pos.x, tower.pos.y, tower.range)
             new_projectile = tower.update(dt, nearby_enemies)
             if new_projectile:
                 self.projectiles.append(new_projectile)
+                if tower.type_name == "arrow":
+                    self.sound_manager.play_sfx("arrow_shoot")
+                elif tower.type_name == "sniper":
+                    self.sound_manager.play_sfx("arrow_shoot")
+                elif tower.type_name == "cannon":
+                    self.sound_manager.play_sfx("cannon_shoot")
 
         for proj in self.projectiles:
             proj.update(dt)
@@ -183,10 +189,12 @@ class GameController:
             if not enemy.is_alive:
                 if enemy.reached_base:
                     self.base_hp -= enemy.base_damage
+                    self.sound_manager.play_sfx("base_hit")
                 else:
                     self.money += enemy.reward
                     self.enemies_killed += 1
                     self.gold_earned += enemy.reward
+                    self.sound_manager.play_sfx("enemy_death")
 
         self.enemies = [e for e in self.enemies if e.is_alive]
         self.projectiles = [p for p in self.projectiles if p.is_active]
@@ -203,23 +211,13 @@ class GameController:
                 self.game_view.draw_tower(tower, target)
             for enemy in self.enemies:
                 self.game_view.draw_enemy(enemy)
-            self.hud_view.render(
-                self.screen,
-                self.base_hp,
-                self.money,
-                self.wave_manager.current_wave,
-            )
+            self.hud_view.render(self.screen, self.base_hp, self.money, self.wave_manager.current_wave)
             self.pause_menu.render()
             return
 
         if self.state == GameState.GAME_OVER:
             victory = self.wave_manager.current_wave > 5
-            self.game_over_view.render(
-                victory,
-                self.wave_manager.current_wave,
-                self.enemies_killed,
-                self.gold_earned,
-            )
+            self.game_over_view.render(victory, self.wave_manager.current_wave, self.enemies_killed, self.gold_earned)
             return
 
         self.screen.fill((0, 0, 0))
@@ -227,24 +225,11 @@ class GameController:
         for tower in self.towers:
             target = getattr(tower, "target", None)
             self.game_view.draw_tower(tower, target)
-            pygame.draw.circle(
-                self.screen,
-                (255, 255, 255),
-                (int(tower.pos.x), int(tower.pos.y)),
-                tower.range,
-                1,
-            )
+            pygame.draw.circle(self.screen, (255, 255, 255), (int(tower.pos.x), int(tower.pos.y)), tower.range, 1)
         for enemy in self.enemies:
             self.game_view.draw_enemy(enemy)
         for proj in self.projectiles:
             self.game_view.draw_projectile(proj)
-        self.hud_view.render(
-            self.screen,
-            self.base_hp,
-            self.money,
-            self.wave_manager.current_wave,
-        )
+        self.hud_view.render(self.screen, self.base_hp, self.money, self.wave_manager.current_wave)
         self.tower_panel.render(self.money)
-        self.tower_info_view.render(
-            self.tower_info_view.selected_tower, self.money
-        )
+        self.tower_info_view.render(self.tower_info_view.selected_tower, self.money)
