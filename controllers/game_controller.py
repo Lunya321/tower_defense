@@ -2,6 +2,7 @@ import pygame
 from models.map_model import MapModel
 from models.wave_manager import WaveManager
 from models.towers import ArrowTower, CannonTower, SlowTower, SniperTower
+from models.effects import VisualEffect
 from views.map_renderer import MapRenderer
 from views.hud_view import HudView
 from views.tower_panel_view import TowerPanelView
@@ -41,6 +42,7 @@ class GameController:
         self.enemies = []
         self.towers = []
         self.projectiles = []
+        self.effects = []
         self.money = 100
         self.base_hp = 20
         self.enemies_killed = 0
@@ -60,6 +62,7 @@ class GameController:
         self.enemies.clear()
         self.towers.clear()
         self.projectiles.clear()
+        self.effects.clear()
         self.money = 100
         self.base_hp = 20
         self.enemies_killed = 0
@@ -184,6 +187,12 @@ class GameController:
 
         for proj in self.projectiles:
             proj.update(dt)
+            if hasattr(proj, 'effect_type') and not proj.is_active:
+                effect = VisualEffect(proj.pos, proj.effect_type, duration=0.3)
+                self.effects.append(effect)
+
+        for effect in self.effects:
+            effect.update(dt)
 
         for enemy in self.enemies:
             if not enemy.is_alive:
@@ -198,6 +207,7 @@ class GameController:
 
         self.enemies = [e for e in self.enemies if e.is_alive]
         self.projectiles = [p for p in self.projectiles if p.is_active]
+        self.effects = [e for e in self.effects if e.is_active]
 
     def render(self):
         if self.state == GameState.MENU:
@@ -230,6 +240,8 @@ class GameController:
             self.game_view.draw_enemy(enemy)
         for proj in self.projectiles:
             self.game_view.draw_projectile(proj)
+        for effect in self.effects:
+            self.game_view.draw_effect(effect)
         self.hud_view.render(self.screen, self.base_hp, self.money, self.wave_manager.current_wave)
         self.tower_panel.render(self.money)
         self.tower_info_view.render(self.tower_info_view.selected_tower, self.money)

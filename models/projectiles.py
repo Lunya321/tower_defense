@@ -49,12 +49,14 @@ class SniperArrow(Projectile):
 class Cannonball(Projectile):
     def __init__(self, start_pos, target, damage):
         super().__init__(start_pos, target, damage=damage, speed=250, type_name="cannonball")
+        self.effect_type = "cannonball"
 
 class IceProjectile(Projectile):
     def __init__(self, start_pos, target, damage):
         super().__init__(start_pos, target, damage=damage, speed=350, type_name="ice")
         self.slow_factor = 0.5
         self.slow_duration = 2.0
+        self.effect_type = "ice"
 
     def hit_target(self):
         self.is_active = False

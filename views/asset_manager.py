@@ -77,8 +77,8 @@ class AssetManager:
             ).convert_alpha()
 
             self.effects["cannonball"] = pygame.transform.scale(
-                cannon_eff, (24, 24)
+                cannon_eff, (40, 40)
             )
-            self.effects["ice"] = pygame.transform.scale(ice_eff, (24, 24))
+            self.effects["ice"] = pygame.transform.scale(ice_eff, (30, 30))
         except Exception:
             pass
