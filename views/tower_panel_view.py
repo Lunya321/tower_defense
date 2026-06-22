@@ -42,7 +42,7 @@ class TowerPanelView:
             self.screen.blit(name_surface, (x + 60, y + 10))
 
             cost_color = (255, 215, 0) if can_afford else (255, 50, 50)
-            cost_surface = self.font.render(f"{cost}g", True, cost_color)
+            cost_surface = self.font.render(f"{cost}", True, cost_color)
             self.screen.blit(cost_surface, (x + 60, y + 35))
 
     def handle_click(self, mouse_pos):

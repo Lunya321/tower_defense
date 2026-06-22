@@ -1,3 +1,4 @@
+import random
 from models.enemies import BasicEnemy, FastEnemy, TankEnemy, HealerEnemy
 
 class WaveManager:
@@ -6,6 +7,7 @@ class WaveManager:
         self.tile_size = tile_size
         self.current_wave = 1
         self.max_waves = 5
+        self.level = 1
         self.is_active = False
         self.enemies_queue = []
         
@@ -17,27 +19,28 @@ class WaveManager:
     def _start_wave(self):
         self.is_active = True
         self.enemies_queue = self._generate_wave_enemies()
+        random.shuffle(self.enemies_queue)
         self.spawn_timer = self.spawn_delay
 
     def _generate_wave_enemies(self):
         enemies = []
-        basic_count = 3 + (self.current_wave * 2)
+        basic_count = 3 + (self.current_wave * 2) + (self.level * 2)
         
         for _ in range(basic_count):
             enemies.append("basic")
         
-        if self.current_wave >= 2:
-            fast_count = self.current_wave - 1
+        if self.current_wave >= 2 or self.level >= 2:
+            fast_count = self.current_wave + self.level
             for _ in range(fast_count):
                 enemies.append("fast")
         
-        if self.current_wave >= 3:
-            tank_count = max(1, self.current_wave - 2)
+        if self.current_wave >= 3 or self.level >= 2:
+            tank_count = max(1, self.current_wave - 2 + self.level)
             for _ in range(tank_count):
                 enemies.append("tank")
         
-        if self.current_wave >= 4:
-            healer_count = max(1, self.current_wave - 3)
+        if self.current_wave >= 4 or self.level >= 3:
+            healer_count = max(1, self.current_wave - 3 + self.level - 1)
             for _ in range(healer_count):
                 enemies.append("healer")
         
@@ -74,3 +77,12 @@ class WaveManager:
                 self.current_wave += 1
                 
         return None
+
+    def is_level_complete(self):
+        return self.current_wave > self.max_waves
+
+    def next_level(self):
+        self.level += 1
+        self.current_wave = 1
+        self.is_active = False
+        self.wave_timer = 0.0

@@ -6,9 +6,9 @@ class PauseMenuView:
         self.font_title = pygame.font.SysFont('Arial', 36, bold=True)
         self.font_button = pygame.font.SysFont('Arial', 20)
         self.buttons = [
-            {"text": "Продолжить", "action": "resume", "rect": pygame.Rect(300, 250, 200, 40)},
-            {"text": "Настройки", "action": "settings", "rect": pygame.Rect(300, 310, 200, 40)},
-            {"text": "Выйти в меню", "action": "main_menu", "rect": pygame.Rect(300, 370, 200, 40)},
+            {"text": "Resume", "action": "resume", "rect": pygame.Rect(300, 250, 200, 40)},
+            {"text": "Settings", "action": "settings", "rect": pygame.Rect(300, 310, 200, 40)},
+            {"text": "Main Menu", "action": "main_menu", "rect": pygame.Rect(300, 370, 200, 40)},
         ]
 
     def render(self):
@@ -16,7 +16,7 @@ class PauseMenuView:
         overlay.fill((0, 0, 0, 150))
         self.screen.blit(overlay, (0, 0))
 
-        title = self.font_title.render("Пауза", True, (255, 255, 255))
+        title = self.font_title.render("Paused", True, (255, 255, 255))
         title_rect = title.get_rect(center=(400, 180))
         self.screen.blit(title, title_rect)
 

@@ -6,9 +6,9 @@ class MenuView:
         self.font_title = pygame.font.SysFont('Arial', 48, bold=True)
         self.font_button = pygame.font.SysFont('Arial', 24)
         self.buttons = [
-            {"text": "Новая игра", "action": "new_game", "rect": pygame.Rect(300, 250, 200, 50)},
-            {"text": "Настройки", "action": "settings", "rect": pygame.Rect(300, 320, 200, 50)},
-            {"text": "Выход", "action": "quit", "rect": pygame.Rect(300, 390, 200, 50)},
+            {"text": "New Game", "action": "new_game", "rect": pygame.Rect(300, 250, 200, 50)},
+            {"text": "Settings", "action": "settings", "rect": pygame.Rect(300, 320, 200, 50)},
+            {"text": "Quit", "action": "quit", "rect": pygame.Rect(300, 390, 200, 50)},
         ]
 
     def render(self):

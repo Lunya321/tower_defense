@@ -3,7 +3,7 @@ from controllers.state_manager import GameState
 from models.towers import ArrowTower, CannonTower, SlowTower, SniperTower
 
 class InputHandler:
-    def __init__(self, state_manager, menu_view, pause_menu, game_over_view, tower_panel_view, tower_info_view, settings_view, sound_manager):
+    def __init__(self, state_manager, menu_view, pause_menu, game_over_view, tower_panel_view, tower_info_view, settings_view, victory_view, sound_manager):
         self.state_manager = state_manager
         self.menu_view = menu_view
         self.pause_menu = pause_menu
@@ -11,6 +11,7 @@ class InputHandler:
         self.tower_panel_view = tower_panel_view
         self.tower_info_view = tower_info_view
         self.settings_view = settings_view
+        self.victory_view = victory_view
         self.sound_manager = sound_manager
         self.tower_factories = {
             "arrow": ArrowTower,
@@ -62,6 +63,14 @@ class InputHandler:
             action = self.game_over_view.handle_click(mouse_pos)
             if action == "new_game":
                 self.state_manager.start_new_game()
+            elif action == "main_menu":
+                self.state_manager.state = GameState.MENU
+            return
+
+        if state == GameState.VICTORY:
+            action = self.victory_view.handle_click(mouse_pos)
+            if action == "next_level":
+                self.state_manager.next_level()
             elif action == "main_menu":
                 self.state_manager.state = GameState.MENU
             return

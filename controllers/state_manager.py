@@ -9,6 +9,7 @@ class GameState:
     PAUSED = "paused"
     GAME_OVER = "game_over"
     SETTINGS = "settings"
+    VICTORY = "victory"
 
 class StateManager:
     def __init__(self, screen, asset_manager):
@@ -27,6 +28,7 @@ class StateManager:
         self.base_hp = 20
         self.enemies_killed = 0
         self.gold_earned = 0
+        self.current_level = 1
 
     def start_new_game(self):
         self.map_model = MapModel()
@@ -41,6 +43,23 @@ class StateManager:
         self.base_hp = 20
         self.enemies_killed = 0
         self.gold_earned = 0
+        self.current_level = 1
+        self.state = GameState.PLAYING
+
+    def next_level(self):
+        self.map_model = MapModel()
+        self.asset_manager.tile_size = self.map_model.tile_size
+        self.map_renderer = MapRenderer(self.screen, self.map_model)
+        self.wave_manager = WaveManager(self.map_model.path, self.map_model.tile_size)
+        self.wave_manager.level = self.current_level
+        self.enemies.clear()
+        self.towers.clear()
+        self.projectiles.clear()
+        self.effects.clear()
+        self.base_hp = 20
+        self.enemies_killed = 0
+        self.gold_earned = 0
+        self.current_level += 1
         self.state = GameState.PLAYING
 
     def enter_settings(self):
@@ -59,9 +78,8 @@ class StateManager:
             sound_manager.play_sfx("game_over")
             return
 
-        if self.wave_manager.current_wave > 5 and len(self.enemies) == 0:
-            self.state = GameState.GAME_OVER
-            sound_manager.play_sfx("game_over")
+        if self.wave_manager.is_level_complete():
+            self.state = GameState.VICTORY
             return
 
         new_enemy = self.wave_manager.update(dt, len(self.enemies))

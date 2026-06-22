@@ -10,6 +10,7 @@ from views.pause_menu_view import PauseMenuView
 from views.game_over_view import GameOverView
 from views.tower_info_view import TowerInfoView
 from views.settings_view import SettingsView
+from views.victory_view import VictoryView
 from views.sound_manager import SoundManager
 from algorithms.spatial_hash import SpatialHash
 
@@ -30,11 +31,12 @@ class GameController:
         self.game_over_view = GameOverView(screen)
         self.tower_info_view = TowerInfoView(screen)
         self.settings_view = SettingsView(screen, sound_manager)
+        self.victory_view = VictoryView(screen)
 
         self.input_handler = InputHandler(
             self.state_manager, self.menu_view, self.pause_menu,
             self.game_over_view, self.tower_panel_view, self.tower_info_view,
-            self.settings_view, self.sound_manager
+            self.settings_view, self.victory_view, self.sound_manager
         )
 
         self.scene_renderer = SceneRenderer(
@@ -51,6 +53,7 @@ class GameController:
         state = self.state_manager.state
         sm = self.state_manager
         current_wave = sm.wave_manager.current_wave if sm.wave_manager else 1
+        current_level = sm.current_level
 
         if state == GameState.MENU:
             self.scene_renderer.render_menu(self.menu_view)
@@ -58,14 +61,18 @@ class GameController:
             self.scene_renderer.render_settings(self.settings_view)
         elif state == GameState.PAUSED:
             self.scene_renderer.render_paused(
-                sm.map_renderer, sm.towers, sm.enemies, sm.money, sm.base_hp, current_wave, self.pause_menu
+                sm.map_renderer, sm.towers, sm.enemies, sm.money, sm.base_hp, current_wave, current_level, self.pause_menu
             )
         elif state == GameState.GAME_OVER:
             self.scene_renderer.render_game_over(
-                self.game_over_view, sm.wave_manager.current_wave > 5, current_wave, sm.enemies_killed, sm.gold_earned
+                self.game_over_view, sm.wave_manager.current_wave > 5 if sm.wave_manager else False, current_wave, sm.enemies_killed, sm.gold_earned
+            )
+        elif state == GameState.VICTORY:
+            self.scene_renderer.render_victory(
+                self.victory_view, current_level, sm.enemies_killed, len(sm.towers), sm.base_hp, sm.gold_earned
             )
         elif state == GameState.PLAYING:
             self.scene_renderer.render_playing(
                 sm.map_renderer, sm.towers, sm.enemies, sm.projectiles, sm.effects,
-                sm.money, sm.base_hp, current_wave
+                sm.money, sm.base_hp, current_wave, current_level
             )

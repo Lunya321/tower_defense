@@ -12,7 +12,7 @@ class SettingsView:
         self.slider_width = 200
         self.slider_height = 10
         self.buttons = [
-            {"text": "Назад", "action": "back", "rect": pygame.Rect(300, 450, 200, 40)},
+            {"text": "Back", "action": "back", "rect": pygame.Rect(300, 450, 200, 40)},
         ]
         self._create_sliders()
 
@@ -28,14 +28,14 @@ class SettingsView:
         self.sync_volumes()
         self.screen.fill((20, 20, 40))
 
-        title = self.font_title.render("Настройки", True, (255, 215, 0))
+        title = self.font_title.render("Settings", True, (255, 215, 0))
         title_rect = title.get_rect(center=(400, 100))
         self.screen.blit(title, title_rect)
 
-        music_label = self.font_label.render("Громкость музыки", True, (255, 255, 255))
+        music_label = self.font_label.render("Music Volume", True, (255, 255, 255))
         self.screen.blit(music_label, (300, 160))
 
-        sfx_label = self.font_label.render("Громкость звуков", True, (255, 255, 255))
+        sfx_label = self.font_label.render("SFX Volume", True, (255, 255, 255))
         self.screen.blit(sfx_label, (300, 240))
 
         pygame.draw.rect(self.screen, (100, 100, 100), self.music_slider_rect)

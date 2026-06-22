@@ -8,7 +8,7 @@ class SceneRenderer:
         self.tower_panel_view = tower_panel_view
         self.tower_info_view = tower_info_view
 
-    def render_playing(self, map_renderer, towers, enemies, projectiles, effects, money, base_hp, current_wave):
+    def render_playing(self, map_renderer, towers, enemies, projectiles, effects, money, base_hp, current_wave, current_level):
         self.screen.fill((0, 0, 0))
         map_renderer.render()
         for tower in towers:
@@ -21,18 +21,18 @@ class SceneRenderer:
             self.game_view.draw_projectile(proj)
         for effect in effects:
             self.game_view.draw_effect(effect)
-        self.hud_view.render(self.screen, base_hp, money, current_wave)
+        self.hud_view.render(self.screen, base_hp, money, current_wave, current_level)
         self.tower_panel_view.render(money)
         self.tower_info_view.render(self.tower_info_view.selected_tower, money)
 
-    def render_paused(self, map_renderer, towers, enemies, money, base_hp, current_wave, pause_menu):
+    def render_paused(self, map_renderer, towers, enemies, money, base_hp, current_wave, current_level, pause_menu):
         map_renderer.render()
         for tower in towers:
             target = getattr(tower, "target", None)
             self.game_view.draw_tower(tower, target)
         for enemy in enemies:
             self.game_view.draw_enemy(enemy)
-        self.hud_view.render(self.screen, base_hp, money, current_wave)
+        self.hud_view.render(self.screen, base_hp, money, current_wave, current_level)
         pause_menu.render()
 
     def render_game_over(self, game_over_view, victory, current_wave, enemies_killed, gold_earned):
@@ -43,3 +43,6 @@ class SceneRenderer:
 
     def render_settings(self, settings_view):
         settings_view.render()
+
+    def render_victory(self, victory_view, level, enemies_killed, towers_count, base_hp, gold_earned):
+        victory_view.render(level, enemies_killed, towers_count, base_hp, gold_earned)

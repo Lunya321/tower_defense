@@ -15,10 +15,10 @@ class HudView:
             img = pygame.image.load(coin_path).convert_alpha()
             self.coin_icon = pygame.transform.scale(img, (28, 28))
 
-    def render(self, screen, base_hp, money, current_wave):
+    def render(self, screen, base_hp, money, current_wave, current_level):
         self._render_hp_bar(screen, base_hp)
         self._render_money(screen, money)
-        self._render_wave(screen, current_wave)
+        self._render_wave(screen, current_wave, current_level)
 
     def _render_hp_bar(self, screen, base_hp):
         max_hp = 20
@@ -55,13 +55,21 @@ class HudView:
         money_surface = self.font_large.render(f"{money}", True, (255, 215, 0))
         screen.blit(money_surface, (text_x, coin_y))
 
-    def _render_wave(self, screen, current_wave):
+    def _render_wave(self, screen, current_wave, current_level):
         screen_width = screen.get_width()
 
-        bg_rect = pygame.Rect(screen_width - 140, 14, 126, 34)
-        pygame.draw.rect(screen, (40, 40, 60), bg_rect, border_radius=8)
-        pygame.draw.rect(screen, (255, 215, 0), bg_rect, 2, border_radius=8)
+        level_rect = pygame.Rect(screen_width - 140, 14, 126, 34)
+        pygame.draw.rect(screen, (40, 40, 60), level_rect, border_radius=8)
+        pygame.draw.rect(screen, (255, 215, 0), level_rect, 2, border_radius=8)
 
-        wave_text = self.font_wave.render(f"WAVE {current_wave}/5", True, (255, 255, 255))
-        wave_rect = wave_text.get_rect(center=bg_rect.center)
-        screen.blit(wave_text, wave_rect)
+        level_text = self.font_wave.render(f"Level {current_level}", True, (255, 215, 0))
+        level_rect_text = level_text.get_rect(center=level_rect.center)
+        screen.blit(level_text, level_rect_text)
+
+        wave_rect = pygame.Rect(screen_width - 140, 54, 126, 34)
+        pygame.draw.rect(screen, (40, 40, 60), wave_rect, border_radius=8)
+        pygame.draw.rect(screen, (255, 255, 255), wave_rect, 2, border_radius=8)
+
+        wave_text = self.font_wave.render(f"Wave {current_wave}/5", True, (255, 255, 255))
+        wave_rect_text = wave_text.get_rect(center=wave_rect.center)
+        screen.blit(wave_text, wave_rect_text)

@@ -32,9 +32,9 @@ class TowerInfoView:
         self.screen.blit(title, (panel_x + 10, panel_y + 10))
 
         info_lines = [
-            f"Урон: {tower.damage}",
-            f"Дальность: {tower.range}",
-            f"Скорость: {tower.cooldown:.1f}с",
+            f"Damage: {tower.damage}",
+            f"Range: {tower.range}",
+            f"Speed: {tower.cooldown:.1f}s",
         ]
         for i, line in enumerate(info_lines):
             text = self.font_info.render(line, True, (255, 255, 255))
@@ -54,8 +54,8 @@ class TowerInfoView:
 
         can_upgrade = money >= upgrade_cost
         for button, text_label, cost in [
-            (self.upgrade_button, "Улучшить", upgrade_cost),
-            (self.sell_button, "Продать", sell_value),
+            (self.upgrade_button, "Upgrade", upgrade_cost),
+            (self.sell_button, "Sell", sell_value),
         ]:
             mouse_pos = pygame.mouse.get_pos()
             if button.collidepoint(mouse_pos):
@@ -64,7 +64,7 @@ class TowerInfoView:
                 pygame.draw.rect(self.screen, (60, 60, 80), button)
             
             text_color = (255, 215, 0) if (can_upgrade or button == self.sell_button) else (150, 150, 150)
-            button_text = f"{text_label} ({cost}g)"
+            button_text = f"{text_label} ({cost})"
             text = self.font_button.render(button_text, True, text_color)
             text_rect = text.get_rect(center=button.center)
             self.screen.blit(text, text_rect)
