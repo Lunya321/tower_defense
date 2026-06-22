@@ -40,3 +40,6 @@ class SceneRenderer:
 
     def render_menu(self, menu_view):
         menu_view.render()
+
+    def render_settings(self, settings_view):
+        settings_view.render()

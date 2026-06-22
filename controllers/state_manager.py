@@ -8,12 +8,14 @@ class GameState:
     PLAYING = "playing"
     PAUSED = "paused"
     GAME_OVER = "game_over"
+    SETTINGS = "settings"
 
 class StateManager:
     def __init__(self, screen, asset_manager):
         self.screen = screen
         self.asset_manager = asset_manager
         self.state = GameState.MENU
+        self.previous_state = GameState.MENU
         self.map_model = None
         self.map_renderer = None
         self.wave_manager = None
@@ -40,6 +42,13 @@ class StateManager:
         self.enemies_killed = 0
         self.gold_earned = 0
         self.state = GameState.PLAYING
+
+    def enter_settings(self):
+        self.previous_state = self.state
+        self.state = GameState.SETTINGS
+
+    def exit_settings(self):
+        self.state = self.previous_state
 
     def update(self, dt, spatial_hash, sound_manager):
         if self.state != GameState.PLAYING:

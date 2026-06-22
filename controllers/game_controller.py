@@ -9,6 +9,7 @@ from views.menu_view import MenuView
 from views.pause_menu_view import PauseMenuView
 from views.game_over_view import GameOverView
 from views.tower_info_view import TowerInfoView
+from views.settings_view import SettingsView
 from views.sound_manager import SoundManager
 from algorithms.spatial_hash import SpatialHash
 
@@ -28,10 +29,12 @@ class GameController:
         self.pause_menu = PauseMenuView(screen)
         self.game_over_view = GameOverView(screen)
         self.tower_info_view = TowerInfoView(screen)
+        self.settings_view = SettingsView(screen, sound_manager)
 
         self.input_handler = InputHandler(
             self.state_manager, self.menu_view, self.pause_menu,
-            self.game_over_view, self.tower_panel_view, self.tower_info_view, self.sound_manager
+            self.game_over_view, self.tower_panel_view, self.tower_info_view,
+            self.settings_view, self.sound_manager
         )
 
         self.scene_renderer = SceneRenderer(
@@ -51,6 +54,8 @@ class GameController:
 
         if state == GameState.MENU:
             self.scene_renderer.render_menu(self.menu_view)
+        elif state == GameState.SETTINGS:
+            self.scene_renderer.render_settings(self.settings_view)
         elif state == GameState.PAUSED:
             self.scene_renderer.render_paused(
                 sm.map_renderer, sm.towers, sm.enemies, sm.money, sm.base_hp, current_wave, self.pause_menu

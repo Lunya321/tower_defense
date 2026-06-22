@@ -3,13 +3,14 @@ from controllers.state_manager import GameState
 from models.towers import ArrowTower, CannonTower, SlowTower, SniperTower
 
 class InputHandler:
-    def __init__(self, state_manager, menu_view, pause_menu, game_over_view, tower_panel_view, tower_info_view, sound_manager):
+    def __init__(self, state_manager, menu_view, pause_menu, game_over_view, tower_panel_view, tower_info_view, settings_view, sound_manager):
         self.state_manager = state_manager
         self.menu_view = menu_view
         self.pause_menu = pause_menu
         self.game_over_view = game_over_view
         self.tower_panel_view = tower_panel_view
         self.tower_info_view = tower_info_view
+        self.settings_view = settings_view
         self.sound_manager = sound_manager
         self.tower_factories = {
             "arrow": ArrowTower,
@@ -34,15 +35,25 @@ class InputHandler:
             if action == "new_game":
                 self.state_manager.start_new_game()
                 self.sound_manager.play_music("background_music.ogg")
+            elif action == "settings":
+                self.state_manager.enter_settings()
             elif action == "quit":
                 pygame.quit()
                 exit()
+            return
+
+        if state == GameState.SETTINGS:
+            action = self.settings_view.handle_click(mouse_pos)
+            if action == "back":
+                self.state_manager.exit_settings()
             return
 
         if state == GameState.PAUSED:
             action = self.pause_menu.handle_click(mouse_pos)
             if action == "resume":
                 self.state_manager.state = GameState.PLAYING
+            elif action == "settings":
+                self.state_manager.enter_settings()
             elif action == "main_menu":
                 self.state_manager.state = GameState.MENU
             return
@@ -104,3 +115,5 @@ class InputHandler:
             self.state_manager.state = GameState.PAUSED
         elif self.state_manager.state == GameState.PAUSED:
             self.state_manager.state = GameState.PLAYING
+        elif self.state_manager.state == GameState.SETTINGS:
+            self.state_manager.exit_settings()

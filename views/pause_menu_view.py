@@ -7,7 +7,8 @@ class PauseMenuView:
         self.font_button = pygame.font.SysFont('Arial', 20)
         self.buttons = [
             {"text": "Продолжить", "action": "resume", "rect": pygame.Rect(300, 250, 200, 40)},
-            {"text": "Выйти в меню", "action": "main_menu", "rect": pygame.Rect(300, 310, 200, 40)},
+            {"text": "Настройки", "action": "settings", "rect": pygame.Rect(300, 310, 200, 40)},
+            {"text": "Выйти в меню", "action": "main_menu", "rect": pygame.Rect(300, 370, 200, 40)},
         ]
 
     def render(self):
