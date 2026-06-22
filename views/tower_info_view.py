@@ -7,11 +7,13 @@ class TowerInfoView:
         self.font_info = pygame.font.SysFont('Arial', 16)
         self.font_button = pygame.font.SysFont('Arial', 14)
         self.selected_tower = None
-        self.buttons = [
-            {"text": "Улучшить", "action": "upgrade", "rect": pygame.Rect(0, 0, 100, 30)},
-            {"text": "Продать", "action": "sell", "rect": pygame.Rect(0, 0, 100, 30)},
-            {"text": "Закрыть", "action": "close", "rect": pygame.Rect(0, 0, 100, 30)},
-        ]
+        self.buttons = []
+        self._create_buttons()
+
+    def _create_buttons(self):
+        self.close_button = pygame.Rect(0, 0, 30, 30)
+        self.upgrade_button = pygame.Rect(0, 0, 150, 30)
+        self.sell_button = pygame.Rect(0, 0, 150, 30)
 
     def render(self, tower, money):
         if not tower:
@@ -41,30 +43,45 @@ class TowerInfoView:
         upgrade_cost = int(tower.cost * 0.7)
         sell_value = int(tower.cost * 0.5)
 
-        self.buttons[0]["rect"] = pygame.Rect(panel_x + 10, panel_y + 120, 150, 25)
-        self.buttons[1]["rect"] = pygame.Rect(panel_x + 10, panel_y + 150, 150, 25)
+        self.close_button = pygame.Rect(panel_x + panel_width - 35, panel_y + 5, 25, 25)
+        self.upgrade_button = pygame.Rect(panel_x + 10, panel_y + 120, 150, 25)
+        self.sell_button = pygame.Rect(panel_x + 10, panel_y + 150, 150, 25)
+
+        pygame.draw.rect(self.screen, (200, 50, 50), self.close_button, border_radius=4)
+        close_text = self.font_button.render("X", True, (255, 255, 255))
+        close_rect = close_text.get_rect(center=self.close_button.center)
+        self.screen.blit(close_text, close_rect)
 
         can_upgrade = money >= upgrade_cost
-        for i, button in enumerate(self.buttons[:2]):
+        for button, text_label, cost in [
+            (self.upgrade_button, "Улучшить", upgrade_cost),
+            (self.sell_button, "Продать", sell_value),
+        ]:
             mouse_pos = pygame.mouse.get_pos()
-            if button["rect"].collidepoint(mouse_pos):
-                pygame.draw.rect(self.screen, (100, 100, 150), button["rect"])
+            if button.collidepoint(mouse_pos):
+                pygame.draw.rect(self.screen, (100, 100, 150), button)
             else:
-                pygame.draw.rect(self.screen, (60, 60, 80), button["rect"])
+                pygame.draw.rect(self.screen, (60, 60, 80), button)
             
-            text_color = (255, 215, 0) if can_upgrade or i == 1 else (150, 150, 150)
-            button_text = f"{button['text']} ({upgrade_cost}g)" if i == 0 else f"Продать ({sell_value}g)"
+            text_color = (255, 215, 0) if (can_upgrade or button == self.sell_button) else (150, 150, 150)
+            button_text = f"{text_label} ({cost}g)"
             text = self.font_button.render(button_text, True, text_color)
-            text_rect = text.get_rect(center=button["rect"].center)
+            text_rect = text.get_rect(center=button.center)
             self.screen.blit(text, text_rect)
 
     def handle_click(self, mouse_pos):
         if not self.selected_tower:
             return None
 
-        for button in self.buttons[:2]:
-            if button["rect"].collidepoint(mouse_pos):
-                return button["action"]
+        if self.close_button.collidepoint(mouse_pos):
+            self.close()
+            return "close"
+
+        if self.upgrade_button.collidepoint(mouse_pos):
+            return "upgrade"
+        elif self.sell_button.collidepoint(mouse_pos):
+            return "sell"
+        
         return None
 
     def close(self):
