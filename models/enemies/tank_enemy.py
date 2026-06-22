@@ -9,4 +9,4 @@ class TankEnemy(Enemy):
         self.hp = 300
         self.max_hp = 300
         self.reward = 30
-        self.base_damage = 3
+        self.base_damage = 3   
